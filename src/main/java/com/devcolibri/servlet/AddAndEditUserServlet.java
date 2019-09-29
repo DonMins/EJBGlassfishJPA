@@ -1,56 +1,41 @@
 package com.devcolibri.servlet;
 
 import com.devcolibri.bean.UserBean;
-import com.devcolibri.entity.User;
+import com.devcolibri.entity.Book;
+import org.omg.PortableInterceptor.SYSTEM_EXCEPTION;
 
 import javax.ejb.EJB;
+import javax.ejb.EJBs;
+import javax.inject.Inject;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.List;
 
 @WebServlet("/add")
 public class AddAndEditUserServlet extends HttpServlet {
 
-    @EJB
+    @EJB(name = "UserBean")
     private UserBean userBean;
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        resp.setContentType("text/html");
-        req.setCharacterEncoding("UTF-8");
 
-        if(req.getParameter("edit") != null){
-            long id = Long.parseLong(req.getParameter("edit"));
-            User user = userBean.get(id);
+        Book f = userBean.getAll().get(0);
+        System.out.println(f);
 
-            req.setAttribute("user", user);
-        }
+        Book book = new Book("aaaaaaaaaaa");
+        userBean.add(book);
 
-        req.getRequestDispatcher("/add.jsp").forward(req, resp);
     }
+
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        resp.setContentType("text/html");
-        req.setCharacterEncoding("UTF-8");
 
-        String name = req.getParameter("name");
-        String lastName = req.getParameter("lastName");
-        int age = Integer.parseInt(req.getParameter("age"));
-
-        if(!req.getParameter("id").equals("")){
-            long id = Long.parseLong(req.getParameter("id"));
-            User user = userBean.get(id);
-            user.setAge(age);
-            user.setLastName(lastName);
-            user.setName(name);
-            userBean.update(user);
-        } else{
-            userBean.add(new User(name, lastName, age));
-        }
         resp.sendRedirect("list");
     }
 }
